@@ -14,7 +14,7 @@ Jeweler::Tasks.new do |gem|
   gem.name = "stampede"
   gem.homepage = "http://github.com/voormedia/stampede"
   gem.license = "MIT"
-  gem.summary = %Q{Unleash a stampede of requests on your web application.}
+  gem.summary = %Q{Stampede is an extendable and scriptable tool to test and measure (web) server performance.}
   gem.description = %Q{TODO: longer description of your gem}
   gem.email = "r.timmermans@voormedia.com"
   gem.authors = ["Rolf Timmermans"]
