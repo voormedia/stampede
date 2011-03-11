@@ -1,0 +1,42 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    activesupport (3.0.5)
+    addressable (2.2.4)
+    cookiejar (0.3.0)
+    em-http-request (1.0.0.beta.2)
+      addressable (>= 2.2.3)
+      em-socksify
+      eventmachine
+      http_parser.rb (>= 0.5.1)
+    em-socksify (0.1.0)
+      eventmachine
+    eventmachine (0.12.10)
+    git (1.2.5)
+    http_parser.rb (0.5.1)
+    i18n (0.5.0)
+    jeweler (1.5.2)
+      bundler (~> 1.0.0)
+      git (>= 1.2.5)
+      rake
+    rake (0.8.7)
+    ruby-ntlm (0.0.1)
+    shoulda-context (1.0.0.beta1)
+    thor (0.14.6)
+    timecop (0.3.5)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  activesupport (~> 3.0)
+  bundler (~> 1.0.0)
+  cookiejar
+  em-http-request (= 1.0.0.beta.2)
+  eventmachine
+  i18n
+  jeweler (~> 1.5.2)
+  ruby-ntlm
+  shoulda-context
+  thor
+  timecop
