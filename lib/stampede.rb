@@ -1,3 +1,5 @@
+require "eventmachine"
+
 module Stampede
   VERSION = [0, 1, 0]
 
@@ -7,7 +9,7 @@ module Stampede
     end
 
     def banner
-      "#{name}/#{version} (#{RUBY_ENGINE || "ruby"} #{RUBY_VERSION}-#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM})"
+      @banner ||= "#{name}/#{version} (#{RUBY_ENGINE rescue "ruby"} #{RUBY_VERSION}-#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM})"
     end
   end
 

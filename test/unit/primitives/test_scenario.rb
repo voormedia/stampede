@@ -15,6 +15,10 @@ class TestScenario < Test::Unit::TestCase
       should "append child processes" do
         assert_kind_of Stampede::Process, subject.children.first
       end
+
+      should "have file basename as name" do
+        assert_equal "simple", subject.name
+      end
     end
   end
 end

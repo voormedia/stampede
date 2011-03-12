@@ -9,32 +9,6 @@ class TestProcess < Test::Unit::TestCase
 
     subject { @object }
 
-    context "callback" do
-      should "be created by before_start" do
-        @klass.class_eval { before_start :flag }
-        @object.send(:dispatch)
-        assert @object.flagged?
-      end
-
-      should "be created by after_start" do
-        @klass.class_eval { after_start :flag }
-        @object.send(:dispatch)
-        assert @object.flagged?
-      end
-
-      should "be created by before_stop" do
-        @klass.class_eval { before_finish :flag }
-        @object.send(:finish)
-        assert @object.flagged?
-      end
-
-      should "be created by after_stop" do
-        @klass.class_eval { after_finish :flag }
-        @object.send(:finish)
-        assert @object.flagged?
-      end
-    end
-
     context "when ran" do
       setup do
         @klass.class_eval { before_start :flag }

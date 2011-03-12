@@ -7,6 +7,10 @@ class TestLambda < Test::Unit::TestCase
       Stampede::Lambda.new { data[:flag] = true; finish }
     end
 
+    should "have lambda as name" do
+      assert_equal "lambda", subject.name
+    end
+
     context "when ran" do
       setup do
         @running = subject.run

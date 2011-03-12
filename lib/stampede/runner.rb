@@ -1,6 +1,5 @@
-require "eventmachine"
-
 module Stampede
+  # Run one or more scenarios.
   class Runner
     class << self
       def start(scenario, reporter)

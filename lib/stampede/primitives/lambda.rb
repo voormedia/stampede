@@ -1,8 +1,9 @@
 module Stampede
+  # Represents an anonymous action.
   class Lambda < Action
-    def initialize(&lambda)
+    def initialize(name = nil, &lambda)
       @lambda = lambda
-      super()
+      super name
     end
 
     def start

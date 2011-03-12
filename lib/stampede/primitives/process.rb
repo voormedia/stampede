@@ -1,4 +1,12 @@
 module Stampede
+  # Processes are the basic abstract unit of a Stampede script. When a process
+  # is run, it is first duplicated, and then its +start+ method is called.
+  # When the task is complete, the +finish+ method should be called. Subclasses
+  # are responsible for performing actions asynchronously, and guaranteeing
+  # that +finish+ is called.
+  #
+  # Because a process is always duplicated before being run, its internal
+  # state may be modified during execution.
   class Process
     autoload :Callbacks, "stampede/primitives/process/callbacks"
     autoload :Extending, "stampede/primitives/process/extending"
@@ -6,6 +14,15 @@ module Stampede
     autoload :Timing, "stampede/primitives/process/timing"
 
     include Callbacks, Extending, Reporting
+
+    class << self
+      # Returns the default process name, which will be used if no specific
+      # name is assigned to a process. Defaults to the class name in lower
+      # case.
+      def process_name
+        @process_name ||= (name.to_s != "") && name.split("::").last.downcase
+      end
+    end
 
     # The context in which this process is running. A process that is not
     # running does not have a context.
@@ -17,8 +34,8 @@ module Stampede
     attr_accessor :name
 
     # Create a new process with the given name (defaulting to the class name).
-    def initialize(name = self.class.name)
-      @name = name
+    def initialize(name = nil)
+      @name = name || self.class.process_name
       @copy = @finished = false
     end
 
@@ -47,6 +64,7 @@ module Stampede
     def to_s
       "#<#{self.class}:0x%.14x @copy=#{@copy.inspect} @finished=#{@finished.inspect}>" % (object_id << 1)
     end
+    alias_method :inspect, :to_s
 
     protected
 

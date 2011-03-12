@@ -32,12 +32,12 @@ class TestProcess < Test::Unit::TestCase
 
       should "report name and value" do
         @running.report("name", "value")
-        assert_equal "ExampleProcess.name: value\n", @stdout.string
+        assert_equal "exampleprocess.name: value\n", @stdout.string
       end
 
       should "report name and nil value" do
         @running.report("name")
-        assert_equal "ExampleProcess.name: \n", @stdout.string
+        assert_equal "exampleprocess.name: \n", @stdout.string
       end
     end
   end
