@@ -22,8 +22,8 @@ module Stampede
           end
         end
 
-        before_start { $stderr.puts "  " * depth + "\033[1;30m>> #{name} (#{self.class.name})\033[0;0m" }
-        after_finish { $stderr.puts "  " * depth + "\033[1;30m<< #{name} (#{self.class.name})\033[0;0m" }
+        before_start { $stderr.puts "  " * depth + "\033[1;30m>> #{name} (#{self.class.superclass.name})\033[0;0m" }
+        after_finish { $stderr.puts "  " * depth + "\033[1;30m<< #{name} (#{self.class.superclass.name})\033[0;0m" }
       end
     end
   end

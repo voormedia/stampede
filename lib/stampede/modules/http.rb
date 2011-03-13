@@ -8,21 +8,23 @@ module Stampede
     METHODS.each do |method|
       class_eval <<-RUBY
         def #{method}(url, options = {})
-          push Request.new(:#{method}, url, options)
+          push Request.create(:#{method}, url, options)
         end
       RUBY
     end
 
     class Request < Action
-      attr_reader :method, :url
+      class_attribute :http_method, :url, :options
 
-      def initialize(method, url, options = {})
-        super url
-        @method, @url, @options = method, url, options
+      class << self
+        def initialize(http_method, url, options = {})
+          super url
+          self.http_method, self.url, self.options = http_method, url, options
+        end
       end
 
       def start
-        request = connection.send(method, collect_options)
+        request = connection.send(http_method, collect_options)
 
         request.headers do
           report :latency => elapsed,
@@ -52,7 +54,7 @@ module Stampede
       end
 
       def collect_options
-        @options.merge :redirects => 5, :head => HEADERS
+        options.merge :redirects => 5, :head => HEADERS
       end
     end
 

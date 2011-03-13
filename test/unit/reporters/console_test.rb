@@ -1,6 +1,6 @@
 require "helper"
 
-class TestConsole < Test::Unit::TestCase
+class ConsoleTest < Test::Unit::TestCase
   context "console reporter" do
     subject { Stampede::Reporters::Console.new }
 

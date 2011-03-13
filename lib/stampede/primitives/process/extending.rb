@@ -7,13 +7,11 @@ module Stampede
   # all inner processes will be extended with all modules their context
   # processes have.
   module Process::Extending
-    attr_reader :extensions
-
     # Extends the current process with the given modules, and makes them
     # available to any process that was created with #derive.
     def use(*modules)
       (@extensions ||= []).concat modules
-      extend(*@extensions)
+      extend *modules
     end
 
     # Extendes a process. The given process will be extended with all modules
@@ -22,7 +20,7 @@ module Stampede
     def augment(object)
       object.tap do |process|
         process.use *@extensions if @extensions
-        process.instance_eval &Proc.new if block_given?
+        process.class_eval &Proc.new if block_given?
       end
     end
   end

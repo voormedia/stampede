@@ -1,8 +1,8 @@
 require "helper"
 
-class TestQueue < Test::Unit::TestCase
+class QueueTest < Test::Unit::TestCase
   context "queue" do
-    subject { Stampede::Queue.new }
+    subject { Stampede::Queue.create }
     should_behave_like_queue
   end
 end

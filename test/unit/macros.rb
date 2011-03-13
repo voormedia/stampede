@@ -4,42 +4,34 @@ class Test::Unit::TestCase
   def self.should_behave_like_collection
     context "without children" do
       context "when ran" do
-        setup { @running = subject.run }
+        setup { @instance = subject.run }
 
         should "finish" do
-          assert_equal true, @running.finished?
+          assert_equal true, @instance.finished?
         end
       end
     end
 
     context "with children" do
       setup do
-        klass = Class.new ExampleProcess
+        klass = ExampleProcess.create
         klass.class_eval do
           before_start do
             @context.instance_variable_set(:@_num, (@context.instance_variable_get(:@_num) || 0) + 1)
           end
         end
-        3.times { subject.push(klass.new) }
+        3.times { subject.push(klass) }
       end
 
       context "when ran" do
-        setup { @running = subject.run }
+        setup { @instance = subject.run }
 
         should "finish" do
-          assert_equal true, @running.finished?
+          assert_equal true, @instance.finished?
         end
 
         should "run children" do
-          assert_equal 3, @running.instance_variable_get(:@_num)
-        end
-
-        should "not change state" do
-          assert_equal false, subject.copy?
-        end
-
-        should "change state of running copy" do
-          assert_equal true, @running.copy?
+          assert_equal 3, @instance.instance_variable_get(:@_num)
         end
       end
     end
@@ -48,7 +40,7 @@ class Test::Unit::TestCase
       setup do
         @children = []
         3.times do
-          @children << (child = ExampleProcess.new)
+          @children << (child = ExampleProcess.create)
           subject.push(child)
         end
       end
@@ -104,7 +96,7 @@ class Test::Unit::TestCase
       end
     end
   end
-  
+
   def self.should_respond_to(*methods)
     methods.each do |method|
       should "respond to #{method}" do
@@ -113,11 +105,19 @@ class Test::Unit::TestCase
     end
   end
 
+  def self.should_not_respond_to(*methods)
+    methods.each do |method|
+      should "not respond to #{method}" do
+        assert !subject.respond_to?(method)
+      end
+    end
+  end
+
   private
 
   def push_async_child(subject, timer, num, total)
     children = @children
-    subject.push Stampede::Lambda.new {
+    subject.push Stampede::Lambda.create {
       EventMachine.add_timer(timer) do
         children << num
         EventMachine.stop if children.length == total

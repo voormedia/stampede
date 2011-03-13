@@ -3,7 +3,7 @@ require "active_support/callbacks"
 module Stampede
   # Defines before/after callbacks for start and finish.
   module Process::Callbacks
-    def self.included(base)
+    def self.extended(base)
       base.class_eval do
         include ActiveSupport::Callbacks
 

@@ -1,20 +1,6 @@
 module Stampede
   # Define some basic actions that are available to scenarios by default.
   module Scenario::Actions
-    # Creates an anonymous module, which is made available to the current
-    # process and all its children.
-    #
-    #   define do
-    #     def do_something_awesome
-    #       get "http://example.com/awesome"
-    #     end
-    #   end
-    #
-    #   do_something_awesome
-    def define
-      use Module.new(&Proc.new)
-    end
-
     # Creates an ad-hoc action. It should call +finish+ when completed.
     #
     #   action "awesome action" do
@@ -22,7 +8,7 @@ module Stampede
     #     finish
     #   end
     def action(name = nil)
-      push augment(Lambda.new(name, &Proc.new))
+      push augment(Lambda.create(name, &Proc.new))
     end
 
     # Defines a session. A session executes its actions sequentially, and is
@@ -38,7 +24,7 @@ module Stampede
     #     get "http://yahoo.com/"
     #   end
     def session(name = nil)
-      push augment(Session.new(name), &Proc.new)
+      push augment(Session.create(name), &Proc.new)
     end
 
     # Delays execution for the given number of seconds. This only makes sense

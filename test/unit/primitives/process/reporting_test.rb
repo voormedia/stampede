@@ -12,9 +12,9 @@ class DummyRunner
   def finish; end
 end
 
-class TestProcess < Test::Unit::TestCase
+class ReportingTest < Test::Unit::TestCase
   context "process" do
-    subject { ExampleProcess.new }
+    subject { ExampleProcess.create }
 
     setup do
       $stdout = @stdout = StringIO.new
@@ -27,16 +27,16 @@ class TestProcess < Test::Unit::TestCase
 
     context "when reporting" do
       setup do
-        @running = subject.run(DummyRunner.new(@reporter))
+        @instance = subject.run(DummyRunner.new(@reporter))
       end
 
       should "report name and value" do
-        @running.report("name", "value")
+        @instance.report("name", "value")
         assert_equal "exampleprocess.name: value\n", @stdout.string
       end
 
       should "report name and nil value" do
-        @running.report("name")
+        @instance.report("name")
         assert_equal "exampleprocess.name: \n", @stdout.string
       end
     end

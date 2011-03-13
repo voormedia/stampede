@@ -1,1 +1,1 @@
-push Stampede::Action.new
+push Stampede::Action.create

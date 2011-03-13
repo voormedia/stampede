@@ -1,17 +1,19 @@
 module Stampede
   # A queue is a collection of processes, which are executed sequentially.
   class Queue < Process
-    attr_reader :children
+    class_attribute :children, :enumerator
 
-    def initialize(name = nil)
-      @children = []
-      @enumerator = @children.each
-      super
-    end
+    class << self
+      def initialize(name = nil)
+        super
+        self.children = []
+        self.enumerator = children.each
+      end
 
-    # Append a new child to the queue.
-    def push(child)
-      @children << child
+      # Append a new child to the queue.
+      def push(child)
+        children << child
+      end
     end
 
     def start
@@ -19,7 +21,7 @@ module Stampede
     end
 
     def finish
-      @enumerator.next.run(self)
+      enumerator.next.run(self)
     rescue StopIteration
       super
     end

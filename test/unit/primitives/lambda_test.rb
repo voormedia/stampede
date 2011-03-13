@@ -1,19 +1,19 @@
 require "helper"
 
-class TestLambda < Test::Unit::TestCase
+class LambdaTest < Test::Unit::TestCase
   context "lambda" do
     subject do
       @data = data = {}
-      Stampede::Lambda.new { data[:flag] = true; finish }
+      Stampede::Lambda.create { data[:flag] = true; finish }
     end
 
     should "have lambda as name" do
-      assert_equal "lambda", subject.name
+      assert_equal "lambda", subject.process_name
     end
 
     context "when ran" do
       setup do
-        @running = subject.run
+        @instance = subject.run
       end
 
       should "call lambda" do
