@@ -71,7 +71,7 @@ module Stampede
     # Kicks off whatever task this process should perform. Subclasses should
     # override this method.
     def start
-      raise NotImplementedError, "Override #start to primitives a process."
+      raise NotImplementedError, "Override #start to define a process."
     end
 
     # Signals that this process is finished. It will alert its context process

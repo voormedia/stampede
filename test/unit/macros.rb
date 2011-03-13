@@ -104,6 +104,14 @@ class Test::Unit::TestCase
       end
     end
   end
+  
+  def self.should_respond_to(*methods)
+    methods.each do |method|
+      should "respond to #{method}" do
+        assert_respond_to subject, method
+      end
+    end
+  end
 
   private
 

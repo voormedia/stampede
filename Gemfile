@@ -5,7 +5,7 @@ gem "em-http-request", "1.0.0.beta.3"
 gem "cookiejar"
 gem "ruby-ntlm"
 gem "thor"
-gem "activesupport", "~> 3.0", :git => "https://github.com/rails/rails.git"
+gem "activesupport", "~> 3.0", :path => "~/Code/rails" #:git => "https://github.com/rails/rails.git"
 
 group :development do
   gem "i18n"

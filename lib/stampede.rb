@@ -29,4 +29,8 @@ module Stampede
   autoload :Session, "stampede/primitives/session"
   autoload :Action, "stampede/primitives/action"
   autoload :Lambda, "stampede/primitives/lambda"
+
+  module Modules
+    autoload :HTTP, "stampede/modules/http"
+  end
 end

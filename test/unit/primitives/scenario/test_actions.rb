@@ -4,9 +4,7 @@ class TestActions < Test::Unit::TestCase
   context "scenario" do
     subject { Stampede::Scenario.new }
 
-    should "respond to action" do
-      assert_respond_to subject, :action
-    end
+    should_respond_to :action, :session, :wait, :define
 
     context "with action" do
       setup do
@@ -36,10 +34,6 @@ class TestActions < Test::Unit::TestCase
       end
     end
 
-    should "respond to session" do
-      assert_respond_to subject, :session
-    end
-
     context "with session" do
       setup do
         subject.session { action { finish } }
@@ -62,10 +56,6 @@ class TestActions < Test::Unit::TestCase
       end
     end
 
-    should "respond to wait" do
-      assert_respond_to subject, :wait
-    end
-
     context "with wait action" do
       setup do
         subject.wait 0.001
@@ -74,10 +64,6 @@ class TestActions < Test::Unit::TestCase
       should "have wait action as child" do
         assert_equal "wait", subject.children.first.name
       end
-    end
-
-    should "respond to define" do
-      assert_respond_to subject, :define
     end
 
     context "with define block" do

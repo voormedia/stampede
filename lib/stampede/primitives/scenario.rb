@@ -5,6 +5,8 @@ module Stampede
 
     DEFAULT_EXTENSION = ".stampede"
 
+    include Modules
+
     class << self
       # Create a new scenario based on the given file.
       def load(path)
