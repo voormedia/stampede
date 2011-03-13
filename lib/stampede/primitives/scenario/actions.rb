@@ -1,6 +1,10 @@
 module Stampede
   # Define some basic actions that are available to scenarios by default.
   module Scenario::Actions
+    def create(klass, *args, &block)
+      push augment(klass.create(*args), &block)
+    end
+
     # Creates an ad-hoc action. It should call +finish+ when completed.
     #
     #   action "awesome action" do
@@ -8,7 +12,7 @@ module Stampede
     #     finish
     #   end
     def action(name = nil)
-      push augment(Lambda.create(name, &Proc.new))
+      create Lambda, Proc.new, name
     end
 
     # Defines a session. A session executes its actions sequentially, and is
@@ -24,7 +28,7 @@ module Stampede
     #     get "http://yahoo.com/"
     #   end
     def session(name = nil)
-      push augment(Session.create(name), &Proc.new)
+      create Session, name, &Proc.new
     end
 
     # Delays execution for the given number of seconds. This only makes sense

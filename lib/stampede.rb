@@ -11,6 +11,10 @@ module Stampede
     def banner
       @banner ||= "#{name}/#{version} (#{RUBY_ENGINE rescue "ruby"} #{RUBY_VERSION}-#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM})"
     end
+
+    def verbose!
+      Process.send :include, Process::Verbose
+    end
   end
 
   autoload :Runner, "stampede/runner"

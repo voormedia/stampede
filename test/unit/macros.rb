@@ -34,6 +34,16 @@ class Test::Unit::TestCase
           assert_equal 3, @instance.instance_variable_get(:@_num)
         end
       end
+
+      context "when ran multiple times" do
+        setup do
+          @instances = [subject.run, subject.run, subject.run]
+        end
+
+        should "run children multiple times" do
+          assert_equal [3, 3, 3], @instances.map { |instance| instance.instance_variable_get(:@_num) }
+        end
+      end
     end
 
     context "when appending children" do
@@ -47,6 +57,26 @@ class Test::Unit::TestCase
 
       should "save children" do
         assert_equal @children, subject.children
+      end
+    end
+
+    context "when inherited" do
+      setup do
+        @inherited = Class.new subject
+      end
+
+      context "when appending children" do
+        setup do
+          @children = []
+          3.times do
+            @children << (child = ExampleProcess.create)
+            @inherited.push(child)
+          end
+        end
+
+        should "save children" do
+          assert_equal @children, @inherited.children
+        end
       end
     end
   end
@@ -117,12 +147,12 @@ class Test::Unit::TestCase
 
   def push_async_child(subject, timer, num, total)
     children = @children
-    subject.push Stampede::Lambda.create {
+    subject.push Stampede::Lambda.create(proc {
       EventMachine.add_timer(timer) do
         children << num
         EventMachine.stop if children.length == total
         finish
       end
-    }
+    })
   end
 end

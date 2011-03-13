@@ -4,7 +4,25 @@ class ActionsTest < Test::Unit::TestCase
   context "scenario" do
     subject { Stampede::Scenario.create }
 
-    should_respond_to :action, :session, :wait
+    should_respond_to :create, :action, :session, :wait
+
+    context "with process" do
+      setup do
+        subject.create Stampede::Lambda, proc { finish }
+      end
+
+      should "have action as child" do
+        assert_equal Stampede::Lambda, subject.children.first.superclass
+      end
+
+      context "when ran" do
+        setup { @instance = subject.run }
+
+        should "execute action" do
+          assert_equal true, @instance.finished?
+        end
+      end
+    end
 
     context "with action" do
       setup do

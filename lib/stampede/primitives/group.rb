@@ -10,7 +10,7 @@ module Stampede
       end
 
       def push(child)
-        children << child
+        self.children << child
       end
     end
 

@@ -10,6 +10,7 @@ module Stampede
     # Extends the current process with the given modules, and makes them
     # available to any process that was created with #derive.
     def use(*modules)
+      modules << Module.new(&Proc.new) if block_given?
       (@extensions ||= []).concat modules
       extend *modules
     end

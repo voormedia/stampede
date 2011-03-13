@@ -4,8 +4,8 @@ module Stampede
     class_attribute :lambda
 
     class << self
-      def initialize(name = nil, &lambda)
-        super
+      def initialize(lambda, name = nil)
+        super name
         self.lambda = lambda
       end
     end

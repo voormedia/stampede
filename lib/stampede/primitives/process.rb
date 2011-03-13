@@ -15,12 +15,12 @@ module Stampede
     autoload :Extending, "stampede/primitives/process/extending"
     autoload :Reporting, "stampede/primitives/process/reporting"
     autoload :Timing, "stampede/primitives/process/timing"
+    autoload :Verbose, "stampede/primitives/process/verbose"
 
     extend Callbacks, Extending
     include Reporting
 
     class_attribute :process_name
-    alias_method :name, :process_name
 
     class << self
       def create(*args, &block)
@@ -68,6 +68,14 @@ module Stampede
       @finished
     end
 
+    def to_s
+      "#{process_name} (#{self.class})"
+    end
+
+    def inspect
+      "#<#{self.class.to_s}:0x%x>" % (object_id << 1)
+    end
+
     protected
 
     # Kicks off whatever task this process should perform. Subclasses should
@@ -79,9 +87,7 @@ module Stampede
     # Signals that this process is finished. It will alert its context process
     # that it is finished.
     def finish
-      run_callbacks(:finish) do
-        @finished = true
-      end
+      run_callbacks(:finish) { @finished = true }
       @context.finish if @context
     end
   end

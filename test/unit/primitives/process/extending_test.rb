@@ -16,6 +16,14 @@ class ExtendingTest < Test::Unit::TestCase
       end
     end
 
+    context "when extended with block" do
+      setup { subject.use { def awesome_method; end } }
+
+      should "respond to new methods" do
+        assert_respond_to subject, :awesome_method
+      end
+    end
+
     context "when augmented" do
       context "with extended process" do
         setup do
