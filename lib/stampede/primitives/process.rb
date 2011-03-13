@@ -71,10 +71,7 @@ module Stampede
     def to_s
       "#{process_name} (#{self.class})"
     end
-
-    def inspect
-      "#<#{self.class.to_s}:0x%x>" % (object_id << 1)
-    end
+    alias_method :inspect, :to_s
 
     protected
 
