@@ -1,5 +1,3 @@
-require "eventmachine"
-
 module Stampede
   VERSION = [0, 1, 0]
 
@@ -9,14 +7,15 @@ module Stampede
     end
 
     def banner
-      @banner ||= "#{name}/#{version} (#{RUBY_ENGINE rescue "ruby"} #{RUBY_VERSION}-#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM})"
+      @banner ||= "#{name}/#{version}"
     end
 
-    def verbose!
-      Process.send :include, Process::Verbose
+    def user_agent
+      @user_agent ||= "#{banner} (#{RUBY_ENGINE rescue "ruby"} #{RUBY_VERSION}-#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM})"
     end
   end
 
+  autoload :Logger, "stampede/logger"
   autoload :Runner, "stampede/runner"
   autoload :Server, "stampede/server"
 
@@ -36,5 +35,6 @@ module Stampede
 
   module Modules
     autoload :HTTP, "stampede/modules/http"
+    autoload :Scheduling, "stampede/modules/scheduling"
   end
 end

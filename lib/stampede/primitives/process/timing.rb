@@ -8,6 +8,7 @@ module Stampede
 
       base.before_finish do
         stop_timer
+        report :start => start_time, :stop => stop_time, :elapsed => elapsed
       end
     end
 

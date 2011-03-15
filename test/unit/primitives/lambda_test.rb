@@ -13,7 +13,7 @@ class LambdaTest < Test::Unit::TestCase
 
     context "when ran" do
       setup do
-        @instance = subject.run
+        @instance = subject.run(DummyRunner.new)
       end
 
       should "call lambda" do

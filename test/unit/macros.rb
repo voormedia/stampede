@@ -4,7 +4,7 @@ class Test::Unit::TestCase
   def self.should_behave_like_collection
     context "without children" do
       context "when ran" do
-        setup { @instance = subject.run }
+        setup { @instance = subject.run(DummyRunner.new) }
 
         should "finish" do
           assert_equal true, @instance.finished?
@@ -24,7 +24,7 @@ class Test::Unit::TestCase
       end
 
       context "when ran" do
-        setup { @instance = subject.run }
+        setup { @instance = subject.run(DummyRunner.new) }
 
         should "finish" do
           assert_equal true, @instance.finished?
@@ -37,7 +37,7 @@ class Test::Unit::TestCase
 
       context "when ran multiple times" do
         setup do
-          @instances = [subject.run, subject.run, subject.run]
+          @instances = [subject.run(DummyRunner.new), subject.run(DummyRunner.new), subject.run(DummyRunner.new)]
         end
 
         should "run children multiple times" do
@@ -94,7 +94,7 @@ class Test::Unit::TestCase
 
       context "when ran" do
         setup do
-          EventMachine.run { EventMachine.set_quantum(5); subject.run }
+          EM.run { EM.set_quantum(5); subject.run(DummyRunner.new) }
         end
 
         should "execute children in order" do
@@ -117,7 +117,7 @@ class Test::Unit::TestCase
 
       context "when ran" do
         setup do
-          EventMachine.run { EventMachine.set_quantum(5); subject.run }
+          EM.run { EM.set_quantum(5); subject.run(DummyRunner.new) }
         end
 
         should "execute children in parallel" do
@@ -148,9 +148,9 @@ class Test::Unit::TestCase
   def push_async_child(subject, timer, num, total)
     children = @children
     subject.push Stampede::Lambda.create(proc {
-      EventMachine.add_timer(timer) do
+      EM.add_timer(timer) do
         children << num
-        EventMachine.stop if children.length == total
+        EM.stop if children.length == total
         finish
       end
     })

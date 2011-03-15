@@ -15,15 +15,17 @@ module Stampede
       end
     end
 
-    def start
+    def start_children
       @enumerator = children.each
-      finish
+      start_next
     end
+    alias_method :start, :start_children
 
-    def finish
+    def start_next
       @enumerator.next.run(self)
     rescue StopIteration
-      super
+      finish
     end
+    alias_method :child_finished, :start_next
   end
 end

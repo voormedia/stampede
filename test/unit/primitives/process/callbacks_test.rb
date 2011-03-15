@@ -6,23 +6,23 @@ class CallbacksTest < Test::Unit::TestCase
 
     context "with callbacks" do
       should "call before_start" do
-        subject.class_eval { before_start :flag }
-        assert subject.run.flagged?
+        subject.before_start :flag
+        assert subject.run(DummyRunner.new).flagged?
       end
 
       should "call after_start" do
-        subject.class_eval { after_start :flag }
-        assert subject.run.flagged?
+        subject.after_start :flag
+        assert subject.run(DummyRunner.new).flagged?
       end
 
       should "call before_stop" do
-        subject.class_eval { before_finish :flag }
-        assert subject.run.flagged?
+        subject.before_finish :flag
+        assert subject.run(DummyRunner.new).flagged?
       end
 
       should "call after_stop" do
-        subject.class_eval { after_finish :flag }
-        assert subject.run.flagged?
+        subject.after_finish :flag
+        assert subject.run(DummyRunner.new).flagged?
       end
     end
 
@@ -33,7 +33,7 @@ class CallbacksTest < Test::Unit::TestCase
       should "call callback once" do
         called = 0
         @super.class_eval { before_start { called += 1 } }
-        subject.run
+        subject.run(DummyRunner.new)
         assert_equal 1, called
       end
     end

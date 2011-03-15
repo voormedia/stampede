@@ -16,7 +16,7 @@ class ActionsTest < Test::Unit::TestCase
       end
 
       context "when ran" do
-        setup { @instance = subject.run }
+        setup { @instance = subject.run(DummyRunner.new) }
 
         should "execute action" do
           assert_equal true, @instance.finished?
@@ -34,7 +34,7 @@ class ActionsTest < Test::Unit::TestCase
       end
 
       context "when ran" do
-        setup { @instance = subject.run }
+        setup { @instance = subject.run(DummyRunner.new) }
 
         should "execute action" do
           assert_equal true, @instance.finished?
@@ -66,7 +66,7 @@ class ActionsTest < Test::Unit::TestCase
       end
 
       context "when ran" do
-        setup { @instance = subject.run }
+        setup { @instance = subject.run(DummyRunner.new) }
 
         should "execute session" do
           assert_equal true, @instance.finished?

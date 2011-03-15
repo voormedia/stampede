@@ -4,6 +4,6 @@ module Stampede
   #
   # Specific actions should typically be a subclass of this class.
   class Action < Process
-    include Process::Timing
+    include Process::Timing, Process::Reporting
   end
 end

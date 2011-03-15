@@ -11,6 +11,8 @@ module Stampede
   # Because a process is always duplicated before being run, its internal
   # state may be modified during execution.
   class Process
+    class FinishedError < StandardError; end
+
     autoload :Callbacks, "stampede/primitives/process/callbacks"
     autoload :Extending, "stampede/primitives/process/extending"
     autoload :Reporting, "stampede/primitives/process/reporting"
@@ -18,7 +20,6 @@ module Stampede
     autoload :Verbose, "stampede/primitives/process/verbose"
 
     extend Callbacks, Extending
-    include Reporting
 
     class_attribute :process_name
 
@@ -33,13 +34,13 @@ module Stampede
         self.process_name = name || superclass.process_name || superclass.name.split("::").last.downcase
       end
 
-      def run(context = nil)
+      def run(context)
         new(context).run
       end
 
       def to_s
         if anonymous?
-          "#<Class:#{superclass.to_s}>"
+          "subclass of #{superclass.to_s}"
         else
           super
         end
@@ -49,13 +50,12 @@ module Stampede
       private :new
     end
 
-    # The context in which this process is running. A process that is not
-    # running does not have a context.
-    attr_accessor :context
+    attr_accessor :context, :runner
 
-    # Create a new process with the given name (defaulting to the class name).
     def initialize(context)
-      @context, @finished = context, false
+      @context = context
+      @runner = context.runner
+      @finished = false
     end
 
     def run
@@ -84,8 +84,9 @@ module Stampede
     # Signals that this process is finished. It will alert its context process
     # that it is finished.
     def finish
+      raise FinishedError, "Process is already finished" if finished?
       run_callbacks(:finish) { @finished = true }
-      @context.finish if @context
+      @context.child_finished if @context
     end
   end
 end

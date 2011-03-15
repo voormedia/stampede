@@ -1,43 +1,29 @@
 require "helper"
 
-class DummyRunner
-  def initialize(reporter)
-    @reporter = reporter
-  end
-
-  def report(*args)
-    @reporter.report(*args)
-  end
-
-  def finish; end
-end
-
 class ReportingTest < Test::Unit::TestCase
   context "process" do
-    subject { ExampleProcess.create }
-
-    setup do
-      $stdout = @stdout = StringIO.new
-      @reporter = Stampede::Reporters::Console.new
-    end
-
-    teardown do
-      $stdout = STDOUT
+    subject do
+      ExampleProcess.create.tap do |process|
+        process.send :include, Stampede::Process::Reporting
+      end
     end
 
     context "when reporting" do
       setup do
-        @instance = subject.run(DummyRunner.new(@reporter))
+        @runner = DummyRunner.new
+        @runner.reporter = DummyReporter.new
       end
 
       should "report name and value" do
-        @instance.report("name", "value")
-        assert_equal "exampleprocess.name: value\n", @stdout.string
+        subject.before_finish { report :name => "value"; send_report }
+        subject.run(@runner)
+        assert_equal "value", @runner.reporter.reported.first["exampleprocess"][:name]
       end
 
       should "report name and nil value" do
-        @instance.report("name")
-        assert_equal "exampleprocess.name: \n", @stdout.string
+        subject.before_finish { report :name => nil }
+        subject.run(@runner)
+        assert_nil @runner.reporter.reported.first["exampleprocess"][:name]
       end
     end
   end

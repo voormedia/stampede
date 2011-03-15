@@ -21,7 +21,7 @@ module Stampede
     def augment(object)
       object.tap do |process|
         process.use *@extensions if @extensions
-        process.class_eval &Proc.new if block_given?
+        process.instance_eval &Proc.new if block_given?
       end
     end
   end

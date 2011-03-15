@@ -1,8 +1,17 @@
 require "helper"
 
 class TimedExampleAction < Stampede::Action
+  class_attribute :delay
+
+  class << self
+    def initialize(delay = 10)
+      self.delay = delay
+      super
+    end
+  end
+
   def start
-    Timecop.freeze(Time.now + 10)
+    Timecop.freeze(Time.now + delay)
     finish
   end
 end
@@ -14,7 +23,7 @@ class ActionTest < Test::Unit::TestCase
     context "when ran" do
       setup do
         Timecop.freeze(@start = Time.now)
-        @instance = subject.run
+        @instance = subject.run DummyRunner.new
       end
 
       teardown { Timecop.return }
@@ -29,6 +38,21 @@ class ActionTest < Test::Unit::TestCase
 
       should "be timed" do
         assert_equal 10 * 1000, @instance.send(:elapsed)
+      end
+    end
+
+    context "when timing out" do
+      subject { TimedExampleAction.create }
+
+      setup do
+        Timecop.freeze(@start = Time.new)
+        subject.after_start
+        @instance = subject.run DummyRunner.new
+      end
+
+      teardown { Timecop.return }
+
+      should "be killed" do
       end
     end
   end

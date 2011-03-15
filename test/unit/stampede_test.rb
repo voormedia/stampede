@@ -1,6 +1,6 @@
 require "helper"
 
-class TestStampede < Test::Unit::TestCase
+class StampedeTest < Test::Unit::TestCase
   context "stampede" do
     context "version" do
       should "be a string" do

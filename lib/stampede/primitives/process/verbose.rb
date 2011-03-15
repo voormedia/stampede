@@ -2,11 +2,18 @@ module Stampede
   module Process::Verbose
     def self.included(base)
       base.before_start do
-        $stderr.puts "  " * depth + "\033[1;30m>> #{self}\033[0;0m"
+        runner.logger.log "  " * depth << "\033[1;30m>> #{object_id.to_s(16)}: #{[self, defined_at].compact.join(', ')}\033[0;0m"
       end
 
       base.after_finish do
-        $stderr.puts "  " * depth + "\033[1;30m<< #{self}\033[0;0m"
+        runner.logger.log "  " * depth << "\033[1;30m<< #{object_id.to_s(16)}: #{self}\033[0;0m"
+      end
+
+      base.class_eval do
+        class_attribute :defined_at
+        def self.inherited(child)
+          child.defined_at = caller.grep(/\.stampede/).first
+        end
       end
     end
 

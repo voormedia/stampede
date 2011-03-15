@@ -14,6 +14,8 @@ require "stampede"
 require "shoulda-context"
 require "timecop"
 require "unit/macros"
+require "em-http-request"
+# require "webmock/test_unit"
 
 class Test::Unit::TestCase
   def fixture_path(path)
@@ -23,14 +25,49 @@ end
 
 class ExampleProcess < Stampede::Process
   def flagged?
-    @flagged
+    @flags > 0
   end
 
   def flag
-    @flagged = true
+    @flags = @flags.to_i + 1
+  end
+
+  def flags
+    @flags
   end
 
   def start
     finish
+  end
+
+  alias_method :child_finished, :finish
+end
+
+class DummyRunner
+  attr_accessor :reporter
+
+  def initialize
+    @reporter = DummyReporter.new
+  end
+
+  def finish
+    EM.stop if EM.reactor_running?
+  end
+  alias_method :child_finished, :finish
+
+  def runner
+    self
+  end
+end
+
+class DummyReporter
+  attr_accessor :reported
+
+  def initialize
+    @reported = []
+  end
+
+  def report(name, data)
+    @reported << { name => data }
   end
 end

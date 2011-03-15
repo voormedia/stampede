@@ -14,17 +14,18 @@ module Stampede
       end
     end
 
-    def start
-      @running = children.length + 1
+    def start_children
+      @running = (@running || 0) + children.length + 1
       children.each do |child|
         child.run(self)
       end
-      finish
+      child_finished
     end
+    alias_method :start, :start_children
 
-    def finish
+    def child_finished
       @running -= 1
-      super if @running.zero?
+      finish if @running.zero?
     end
   end
 end

@@ -22,8 +22,10 @@ class ProcessTest < Test::Unit::TestCase
 
     context "when ran" do
       setup do
-        subject.class_eval { before_start :flag }
-        @instance = subject.run
+        subject.before_start :flag
+        @runner = DummyRunner.new
+        @context = ExampleProcess.create.send(:new, @runner)
+        @instance = subject.run(@context)
       end
 
       should "be instantiated" do
@@ -33,13 +35,43 @@ class ProcessTest < Test::Unit::TestCase
       should "invoke start on instance" do
         assert @instance.flagged?
       end
+
+      should "contain reference to context" do
+        assert_equal @context, @instance.context
+      end
+
+      should "contain reference to runner" do
+        assert_equal @runner, @instance.runner
+      end
+    end
+
+    context "when finished" do
+      setup do
+        subject.run @context = ExampleProcess.create.send(:new, DummyRunner.new)
+      end
+
+      should "call finish on context" do
+        assert @context.finished?
+      end
+    end
+
+    context "when finish is spuriously called" do
+      setup do
+        subject.after_start { finish; finish }
+      end
+
+      should "raise" do
+        assert_raises Stampede::Process::FinishedError do
+          subject.run DummyRunner.new
+        end
+      end
     end
 
     context "when inspected" do
       subject { Stampede::Process.create }
 
       should "show superclass name" do
-        assert_equal "#<Class:Stampede::Process>", subject.inspect
+        assert_equal "subclass of Stampede::Process", subject.inspect
       end
     end
   end
@@ -49,7 +81,7 @@ class ProcessTest < Test::Unit::TestCase
 
     should "raise not implemented error when ran" do
       assert_raises NotImplementedError do
-        subject.run
+        subject.run DummyRunner.new
       end
     end
   end
