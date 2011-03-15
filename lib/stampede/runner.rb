@@ -1,4 +1,5 @@
 require "eventmachine"
+require "rainbow"
 
 module Stampede
   # Run one or more scenarios.
@@ -8,7 +9,7 @@ module Stampede
 
     include Daemonization
 
-    attr_reader :reporter, :logger, :config
+    attr_reader :logger, :config, :runner
 
     class << self
       def start(scenario, config)
@@ -19,7 +20,8 @@ module Stampede
     def initialize(scenario, config)
       @scenario = scenario
       @config = Runner::Configuration.new(config)
-      @reporter = Reporters::Console.new(@logger = @config.logger)
+      @reporter = Reporters::JSON.new(@logger = @config.logger)
+      @runner = self
     end
 
     def start
@@ -28,33 +30,35 @@ module Stampede
       verbose! if config.verbose?
       daemonize! if config.daemonize?
 
-      logger.log "Starting #{Stampede.banner}..."
-      logger.log "Running scenario '#{@scenario.process_name}'."
+      logger.log "#{Stampede.banner} (#{Stampede.codename}) is starting..."
+      logger.log "Running scenario '#{@scenario.process_name}'..."
 
       execute
     end
 
-    def finish(exit_message = "Exiting.")
+    def finish(exit_message = "Finished.")
       logger.log exit_message
-      EM.stop
+      logger.close { EM.stop }
     end
     alias_method :child_finished, :finish
 
     def abort(exit_message = "Aborted.")
-      $stderr.puts exit_message
+      EM.stop
+      logger.log logger.bright_color(exit_message, :red)
+      logger.close!
       exit! 1
     end
 
-    def runner
-      self
+    def record(data)
+      @reporter.record(data)
     end
 
     private
 
     def trap_signals
-      Signal.trap(:KILL) { abort "Killed!" }
-      Signal.trap(:TERM) { finish "Terminated!" }
-      Signal.trap(:INT)  { abort "\nInterrupted!" }
+      Signal.trap(:INT)  { abort "Interrupted!" }
+      Signal.trap(:TERM) { abort "Terminated!" }
+      Signal.trap(:HUP)  { }  # FIXME: Should reload.
     end
 
     def set_max_connections

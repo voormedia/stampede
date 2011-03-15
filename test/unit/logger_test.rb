@@ -2,7 +2,14 @@ require "helper"
 
 class LoggerTest < Test::Unit::TestCase
   context "logger" do
-    subject { Stampede::Logger.new(@out = StringIO.new) }
+    setup do
+      @out = StringIO.new
+      class << @out
+        alias_method :write_nonblock, :write
+      end
+    end
+
+    subject { Stampede::Logger.new(@out) }
 
     context "when logged to" do
       setup { subject.log "something happened" }

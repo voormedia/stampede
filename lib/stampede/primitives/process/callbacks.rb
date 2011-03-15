@@ -1,22 +1,33 @@
+require "active_support/core_ext/array/extract_options"
+require "active_support/concern"
 require "active_support/callbacks"
 
 module Stampede
   # Defines before/after callbacks for start and finish.
   module Process::Callbacks
-    def self.extended(base)
-      base.class_eval do
-        include ActiveSupport::Callbacks
+    extend ActiveSupport::Concern
+    include ActiveSupport::Callbacks
 
-        callbacks = [:start, :finish]
-        define_callbacks *callbacks
+    included do
+      define_callbacks :start, :finish
+    end
 
-        callbacks.product([:before, :after]).each do |method, callback|
-          class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            def self.#{callback}_#{method}(*args, &block)
-              set_callback :#{method}, :#{callback}, *args, &block
-            end
-          RUBY
-        end
+    module ClassMethods
+      def before_start(*args, &block);  before_callback(:start, *args, &block);  end
+      def after_start(*args, &block);   after_callback(:start, *args, &block);   end
+      def before_finish(*args, &block); before_callback(:finish, *args, &block); end
+      def after_finish(*args, &block);  after_callback(:finish, *args, &block);  end
+
+      private
+
+      def before_callback(callback, *args, &block)
+        set_callback(callback, :before, *args, &block)
+      end
+
+      def after_callback(callback, *args, &block)
+        options = args.extract_options!
+        options[:prepend] = true
+        set_callback(callback, :after, *(args << options), &block)
       end
     end
   end

@@ -13,10 +13,27 @@ def work(logger)
     logger2 = logger.new file2
     N.times {
       logger1.log "ASDF ASDF ASDF ASDF ASDF" * 2
+      logger1.log "ASDF ASDF ASDF ASDF ASDF" * 2
+      logger1.log "ASDF ASDF ASDF ASDF ASDF" * 2
+      logger1.log "ASDF ASDF ASDF ASDF ASDF" * 2
+      logger1.log "ASDF ASDF ASDF ASDF ASDF" * 2
+      logger1.log "ASDF ASDF ASDF ASDF ASDF" * 2
+      logger1.log "ASDF ASDF ASDF ASDF ASDF" * 2
+      logger1.log "ASDF ASDF ASDF ASDF ASDF" * 2
+      logger1.log "ASDF ASDF ASDF ASDF ASDF" * 2
+      logger1.log "ASDF ASDF ASDF ASDF ASDF" * 2
+      logger1.log "ASDF ASDF ASDF ASDF ASDF" * 2
+      logger1.log "ASDF ASDF ASDF ASDF ASDF" * 2
       logger1.log "ZXCV ZXCV ZXCV ZXCV ZXCV"
       logger2.log "ASDF ASDF ASDF ASDF ASDF" * 2
       logger2.log "ZXCV ZXCV ZXCV ZXCV ZXCV"
       logger1.log "ASDF ASDF ASDF ASDF ASDF" * 250
+      logger2.log "ZXCV ZXCV ZXCV ZXCV ZXCV"
+      logger2.log "ZXCV ZXCV ZXCV ZXCV ZXCV"
+      logger2.log "ZXCV ZXCV ZXCV ZXCV ZXCV"
+      logger2.log "ZXCV ZXCV ZXCV ZXCV ZXCV"
+      logger2.log "ZXCV ZXCV ZXCV ZXCV ZXCV"
+      logger2.log "ZXCV ZXCV ZXCV ZXCV ZXCV"
       logger2.log "ZXCV ZXCV ZXCV ZXCV ZXCV"
       logger1.log "ASDF ASDF ASDF ASDF ASDF" * 2
       logger2.log "ZXCV ZXCV ZXCV ZXCV ZXCV"
@@ -44,7 +61,8 @@ class Logger2
     else
       File.open(path_or_io, "w+")
     end
-    reset_buffer
+    @buffer = []
+    @offset = 0
   end
 
   BUFFER_SIZE = 8192
@@ -56,6 +74,8 @@ class Logger2
 
   def flush
     return if @flushing
+    @writing = @buffer.join
+    @buffer = []
     write_data
   end
 
@@ -64,20 +84,14 @@ class Logger2
   def write_data
     return unless @io
     @flushing = true
-    @buffer.pos = @offset.to_i
-    @offset += (@io.write_nonblock @buffer.read) # rescue 0)
+    @offset += (@io.write_nonblock @writing[@offset..-1]) # rescue 0)
     if @offset < @buffer.length
       p "missed"
       EM.next_tick { write_data }
     else
-      reset_buffer
+      @offset = 0
       @flushing = false
     end
-  end
-
-  def reset_buffer
-    @buffer = StringIO.new
-    @offset = 0
   end
 end
 

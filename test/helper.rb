@@ -44,10 +44,11 @@ class ExampleProcess < Stampede::Process
 end
 
 class DummyRunner
-  attr_accessor :reporter
+  attr_accessor :reporter, :logger
 
   def initialize
     @reporter = DummyReporter.new
+    @logger = DummyLogger.new
   end
 
   def finish
@@ -58,6 +59,10 @@ class DummyRunner
   def runner
     self
   end
+
+  def record(data)
+    reporter.record(data)
+  end
 end
 
 class DummyReporter
@@ -67,7 +72,15 @@ class DummyReporter
     @reported = []
   end
 
-  def report(name, data)
-    @reported << { name => data }
+  def record(data)
+    @reported << data
   end
+end
+
+class DummyLogger
+  def log(*args); end
+  def close(*args); end
+  def close!(*args); end
+  def color(*args); ""; end
+  def bright_color(*args); ""; end
 end

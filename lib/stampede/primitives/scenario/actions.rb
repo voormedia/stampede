@@ -43,7 +43,7 @@ module Stampede
     #     get "http://yahoo.com/"
     #   end
     def wait(time)
-      action("wait") { EM.add_timer(time) { finish } }
+      action("wait #{time}") { EM.add_timer(time) { finish } }
     end
   end
 end

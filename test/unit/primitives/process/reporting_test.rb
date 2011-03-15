@@ -15,15 +15,27 @@ class ReportingTest < Test::Unit::TestCase
       end
 
       should "report name and value" do
-        subject.before_finish { report :name => "value"; send_report }
+        subject.before_finish { report :name => "value" }
         subject.run(@runner)
-        assert_equal "value", @runner.reporter.reported.first["exampleprocess"][:name]
+        assert_equal({:label=>"exampleprocess", :name=>"value"}, @runner.reporter.reported.first)
       end
 
       should "report name and nil value" do
         subject.before_finish { report :name => nil }
         subject.run(@runner)
-        assert_nil @runner.reporter.reported.first["exampleprocess"][:name]
+        assert_nil @runner.reporter.reported.first[:name]
+      end
+
+      context "from child" do
+        setup do
+          @context = ExampleProcess.create.send(:new, @runner)
+        end
+
+        should "send data to through context to reporter" do
+          subject.before_finish { report :name => "value" }
+          subject.run(@context)
+          assert_equal({:label=>"exampleprocess", :name=>"value"}, @runner.reporter.reported.first)
+        end
       end
     end
   end

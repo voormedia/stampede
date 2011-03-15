@@ -24,24 +24,31 @@ module Stampede
       end
 
       def start
-        request = connection.send(http_method, collect_options)
+        request = build_request
         report :method => http_method
 
+        inflated_content_length = 0
+        latency = nil
+
         request.headers do
-          # p request.last_effective_url.normalize.to_s
-          # p request.redirect?
+          latency ||= elapsed
           report :url => request.last_effective_url.normalize.to_s,
             :status => request.response_header.status,
-            :length => request.response_header.content_length # FIXME: streaming
+            :latency => latency,
+            :compressed => request.response_header.compressed?
         end
 
         request.stream do |data|
-          # p data
+          inflated_content_length += data.length
+          report_sequence :chunks,
+            :length => data.length,
+            :elapsed => elapsed
         end
 
         request.callback do
           report :success => true,
-            :redirects => request.redirects
+            :redirects => request.redirects,
+            :length => inflated_content_length
           finish
         end
 
@@ -54,12 +61,12 @@ module Stampede
 
       private
 
-      def connection
-        EM::HttpRequest.new(url)
+      def build_request
+        EM::HttpRequest.new(url).send(http_method, collect_options)
       end
 
       def collect_options
-        options.merge :redirects => 5, :head => HEADERS, :inactivity_timeout => 30
+        options.merge :redirects => 0, :head => HEADERS, :inactivity_timeout => 30
       end
     end
   end

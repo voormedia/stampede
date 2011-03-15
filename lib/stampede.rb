@@ -13,6 +13,10 @@ module Stampede
     def user_agent
       @user_agent ||= "#{banner} (#{RUBY_ENGINE rescue "ruby"} #{RUBY_VERSION}-#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM})"
     end
+
+    def codename
+      "Thundering Herd"
+    end
   end
 
   autoload :Logger, "stampede/logger"
@@ -20,7 +24,7 @@ module Stampede
   autoload :Server, "stampede/server"
 
   module Reporters
-    autoload :Console, "stampede/reporters/console"
+    autoload :JSON, "stampede/reporters/json"
   end
 
   autoload :Process, "stampede/primitives/process"

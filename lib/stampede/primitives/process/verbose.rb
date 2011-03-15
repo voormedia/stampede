@@ -1,31 +1,39 @@
+require "active_support/concern"
+
 module Stampede
   module Process::Verbose
-    def self.included(base)
-      base.before_start do
-        runner.logger.log "  " * depth << "\033[1;30m>> #{object_id.to_s(16)}: #{[self, defined_at].compact.join(', ')}\033[0;0m"
+    extend ActiveSupport::Concern
+
+    included do
+      before_start do
+        logger.log logger.bright_color(">>", :yellow) << logger.color(" Starting ", :white) <<
+          logger.bright_color(process_name, :yellow) << logger.color(" (#{object_id.to_s(16)}, #{self.class}).", :white)
       end
 
-      base.after_finish do
-        runner.logger.log "  " * depth << "\033[1;30m<< #{object_id.to_s(16)}: #{self}\033[0;0m"
+      after_finish do
+        logger.log logger.bright_color("<<", :green) << logger.color(" Finished ", :white) <<
+          logger.bright_color(process_name, :green) << logger.color(" (#{object_id.to_s(16)}, #{self.class}).", :white)
       end
 
-      base.class_eval do
-        class_attribute :defined_at
-        def self.inherited(child)
-          child.defined_at = caller.grep(/\.stampede/).first
-        end
-      end
-    end
+      alias_method :record_without_logging, :record
+      def record(data)
+        logger.log logger.bright_color("==", :cyan) << logger.color(" Recorded ", :white) <<
+          logger.bright_color(process_name, :cyan) << logger.color(" (#{object_id.to_s(16)}, #{self.class}).", :white) <<
+          logger.color("\n   Attributes: #{data.keys.map(&:to_s).sort.join(", ")}.", :white)
 
-    private
-
-    def depth
-      @depth ||= begin
-        ctx = self
-        level = -1
-        level += 1 while ctx.respond_to? :context and ctx = ctx.context
-        level
+        record_without_logging(data)
       end
+
+      # Process::Reporting.module_eval do
+      #   alias_method :report_without_logging, :report
+      #   def report(data)
+      #     logger.log logger.bright_color(" -", :cyan) << logger.color(" Reported ", :white) <<
+      #       logger.bright_color(process_name, :cyan) << logger.color(" (#{object_id.to_s(16)}, #{self.class}).", :white) <<
+      #       logger.color("\n   Attributes: #{data.keys.map(&:to_s).sort.join(", ")}.", :white)
+      #
+      #     report_without_logging(data)
+      #   end
+      # end
     end
   end
 end

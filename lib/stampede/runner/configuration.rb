@@ -8,6 +8,10 @@ module Stampede
       @config[:max_connections] or @config[:"max-connections"]
     end
 
+    def colorize?
+      @config[:colors] or !@config[:"no-colors"]
+    end
+
     def daemonize?
       @config[:daemonize]
     end
@@ -17,7 +21,11 @@ module Stampede
     end
 
     def logger
-      Logger.new daemonize? ? "stampede.log" : $stdout
+      if daemonize?
+        Logger.new "stampede.log", :colorize => colorize?
+      else
+        Logger.new $stdout, :buffer_size => 256, :colorize => colorize?
+      end
     end
   end
 end

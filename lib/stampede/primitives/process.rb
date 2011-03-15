@@ -19,7 +19,7 @@ module Stampede
     autoload :Timing, "stampede/primitives/process/timing"
     autoload :Verbose, "stampede/primitives/process/verbose"
 
-    extend Callbacks, Extending
+    include Callbacks, Extending
 
     class_attribute :process_name
 
@@ -50,22 +50,27 @@ module Stampede
       private :new
     end
 
-    attr_accessor :context, :runner
+    attr_reader :context, :runner, :logger
 
     def initialize(context)
       @context = context
-      @runner = context.runner
+      @runner = @context.runner
+      @logger = @runner.logger
       @finished = false
     end
 
     def run
-      run_callbacks(:start) { start }
+      _run_start_callbacks { start }
       self
     end
 
     # Returns whether or not the current process has finished its task.
     def finished?
       @finished
+    end
+
+    def record(data)
+      @context.record(data)
     end
 
     def to_s
@@ -85,7 +90,7 @@ module Stampede
     # that it is finished.
     def finish
       raise FinishedError, "Process is already finished" if finished?
-      run_callbacks(:finish) { @finished = true }
+      _run_finish_callbacks { @finished = true }
       @context.child_finished if @context
     end
   end

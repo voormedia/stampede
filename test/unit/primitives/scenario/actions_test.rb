@@ -80,7 +80,7 @@ class ActionsTest < Test::Unit::TestCase
       end
 
       should "have wait action as child" do
-        assert_equal "wait", subject.children.first.process_name
+        assert_equal "wait 0.001", subject.children.first.process_name
       end
     end
   end

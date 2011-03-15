@@ -39,10 +39,6 @@ class ProcessTest < Test::Unit::TestCase
       should "contain reference to context" do
         assert_equal @context, @instance.context
       end
-
-      should "contain reference to runner" do
-        assert_equal @runner, @instance.runner
-      end
     end
 
     context "when finished" do
