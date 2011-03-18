@@ -1,4 +1,5 @@
 require "active_support/concern"
+require "pp"
 
 module Stampede
   module Process::Verbose
@@ -20,6 +21,7 @@ module Stampede
         logger.log logger.bright_color("==", :cyan) << logger.color(" Recorded ", :white) <<
           logger.bright_color(process_name, :cyan) << logger.color(" (#{object_id.to_s(16)}, #{self.class}).", :white) <<
           logger.color("\n   Attributes: #{data.keys.map(&:to_s).sort.join(", ")}.", :white)
+        logger.log logger.color(data.pretty_inspect, :white)
 
         record_without_logging(data)
       end

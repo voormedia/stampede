@@ -6,5 +6,9 @@ module Stampede
   class Action < Process
     include Process::Reporting
     include Process::Timing
+
+    def stateful?
+      @stateful ||= @context.respond_to? :[]=
+    end
   end
 end

@@ -2,7 +2,7 @@ source "http://rubygems.org"
 
 gem "i18n"
 gem "eventmachine", "1.0.0.beta.3"
-gem "em-http-request", "1.0.0.beta.3"
+gem "em-http-request"
 gem "cookiejar"
 gem "ruby-ntlm"
 gem "thor"

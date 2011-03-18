@@ -5,7 +5,7 @@ module Stampede
     extend ActiveSupport::Concern
 
     included do
-      after_start { @state = {} }
+      before_start { @state = {} }
     end
 
     def [](key)

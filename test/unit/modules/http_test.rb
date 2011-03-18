@@ -49,6 +49,10 @@ class HTTPTest < Test::Unit::TestCase
       should "report content length" do
         assert_equal 9162, @reported[:length]
       end
+
+      should "report correct label" do
+        assert_equal "get http://localhost:99876/", @reported[:label]
+      end
     end
 
     context "when ran in session" do
@@ -73,13 +77,21 @@ class HTTPTest < Test::Unit::TestCase
 
       teardown { Timecop.return }
 
-      should "set cookie in session" do
+      should "set first cookie in session" do
         assert_equal "PREF=ID=91e9acb4192bc78a:FF=0:TM=1300456190:LM=1300456190:S=fOrXavOfE1_3KuzY",
-          @session[:http_cookiejar].get_cookies("http://localhost:99876/").first.to_s
+          @session[:http_cookiejar].get_cookies("http://localhost:99876/")[0].to_s
       end
 
-      should "report a hash" do
-        assert_kind_of Hash, @reported
+      should "set second cookie in session" do
+        assert_equal "NID=45=AHVUp1ZHBPCDLzQNJLpkPmjZxZJ354aS5tWfyWTYSSWKzahBQ-ELAaGiwL43YhDtU9Fc7K8mWhbPBPFwR3cAR0MfVWKpwgFo35WeidRiOxKmyQvkBeXQsaGNuDs-iJJU",
+          @session[:http_cookiejar].get_cookies("http://localhost:99876/")[1].to_s
+      end
+
+      should "add cookies to next request" do
+        next_request = Stampede::Modules::HTTP::Request.create(:get, "http://localhost:99876/").send(:new, @session)
+        assert_equal "PREF=ID=91e9acb4192bc78a:FF=0:TM=1300456190:LM=1300456190:S=fOrXavOfE1_3KuzY;" +
+          "NID=45=AHVUp1ZHBPCDLzQNJLpkPmjZxZJ354aS5tWfyWTYSSWKzahBQ-ELAaGiwL43YhDtU9Fc7K8mWhbPBPFwR3cAR0MfVWKpwgFo35WeidRiOxKmyQvkBeXQsaGNuDs-iJJU",
+          next_request.send(:collect_headers)["cookie"]
       end
 
       should "report http response code" do

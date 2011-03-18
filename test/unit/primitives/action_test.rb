@@ -39,6 +39,36 @@ class ActionTest < Test::Unit::TestCase
       should "be timed" do
         assert_equal 10 * 1000, @instance.send(:elapsed)
       end
+
+      context "inside session" do
+        setup do
+          instance = nil
+          subject.before_start { instance = self }
+          session = Stampede::Session.create
+          session.push subject
+          session.run DummyRunner.new
+          @instance = instance
+        end
+
+        should "be stateful" do
+          assert_equal true, @instance.stateful?
+        end
+      end
+
+      context "outside session" do
+        setup do
+          instance = nil
+          subject.before_start { instance = self }
+          session = Stampede::Scenario.create
+          session.push subject
+          session.run DummyRunner.new
+          @instance = instance
+        end
+
+        should "be stateless" do
+          assert_equal false, @instance.stateful?
+        end
+      end
     end
 
     context "when timing out" do

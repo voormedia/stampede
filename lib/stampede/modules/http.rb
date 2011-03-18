@@ -19,7 +19,7 @@ module Stampede
 
       class << self
         def initialize(http_method, url, options = {})
-          super url
+          super "#{http_method} #{url}"
           self.http_method, self.url, self.options = http_method, url, options
         end
       end
@@ -32,10 +32,10 @@ module Stampede
         latency = nil
 
         request.headers do
-          last_url = request.last_effective_url.normalize.to_s
           latency ||= elapsed
-
-          cookiejar.set_cookie last_url, request.response_header["SET_COOKIE"]
+          last_url = request.last_effective_url.normalize.to_s
+          set_cookies last_url, request.response_header if stateful?
+          report :head => request.response_header
 
           report :url => last_url,
             :status => request.response_header.status,
@@ -66,8 +66,14 @@ module Stampede
 
       private
 
+      def set_cookies(url, headers)
+        [*headers["SET_COOKIE"]].each do |header|
+          cookiejar.set_cookie url, header
+        end
+      end
+
       def cookiejar
-        state[:http_cookiejar] ||= CookieJar::Jar.new
+        @cookiejar ||= (@context[:http_cookiejar] ||= CookieJar::Jar.new)
       end
 
       def build_request
@@ -75,11 +81,13 @@ module Stampede
       end
 
       def collect_options
-        options.merge :redirects => 5, :head => HEADERS, :inactivity_timeout => 30
+        options.merge :redirects => 5, :head => collect_headers, :inactivity_timeout => 30
       end
 
-      def state
-        if @context.respond_to? :[]= then @context else {} end
+      def collect_headers
+        HEADERS.dup.tap do |headers|
+          headers.merge! "cookie" => cookiejar.get_cookie_header(url) if stateful?
+        end
       end
     end
   end
