@@ -61,7 +61,7 @@ module Stampede
 
     def write_buffer_blocking
       return unless @io
-      @io.write @buffer[@offset..-1]
+      @io.write @buffer[@offset..-1] rescue nil
     end
 
     def reset_buffer

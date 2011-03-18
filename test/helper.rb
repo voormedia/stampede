@@ -13,13 +13,33 @@ $LOAD_PATH.unshift(File.expand_path(File.join(File.dirname(__FILE__), "..", "lib
 require "stampede"
 require "shoulda-context"
 require "timecop"
+require "rr"
 require "unit/macros"
-require "em-http-request"
-# require "webmock/test_unit"
+
+module MockServer
+  class << self
+    attr_accessor :response
+
+    def start(response = nil)
+      self.response = response if response
+      EM.start_server "localhost", 99876, self
+    end
+  end
+
+  def receive_data(data)
+    send_data MockServer.response
+  end
+end
 
 class Test::Unit::TestCase
+  include RR::Adapters::TestUnit
+
   def fixture_path(path)
     File.expand_path(path, File.join(File.dirname(__FILE__), "fixtures"))
+  end
+
+  def read_fixture(path)
+    File.read fixture_path(path)
   end
 end
 

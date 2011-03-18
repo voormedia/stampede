@@ -15,21 +15,23 @@ class HTTPTest < Test::Unit::TestCase
     subject do
       Stampede::Scenario.create.class_eval do
         use Stampede::Modules::HTTP
-        get "http://example.com"
+        get "http://localhost:99876/"
         self
       end
     end
 
     context "when ran" do
       setup do
-        stub_request(:get, "http://example.com").to_return({ :status => 200, :body => "abc" }, { :body => "def" })
         runner = DummyRunner.new
         runner.reporter = @reporter = DummyReporter.new
-        EM.run { subject.run runner }
+        EM.run do
+          MockServer.start read_fixture("http_responses/google.nl")
+          subject.run runner
+        end
       end
 
       should "report http response code" do
-        assert_equal 200, @reporter.reported.first[1][:status]
+        assert_equal 200, @reporter.reported.first[:status]
       end
     end
   end

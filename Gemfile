@@ -15,5 +15,5 @@ group :development do
   gem "jeweler", "~> 1.5.2"
   gem "shoulda-context", "1.0.0.beta1"
   gem "timecop", "~> 0.3"
-  gem "webmock"
+  gem "rr"
 end
