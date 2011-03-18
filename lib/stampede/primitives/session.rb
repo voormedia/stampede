@@ -5,6 +5,7 @@ module Stampede
   class Session < Queue
     include Process::Reporting
     include Process::Timing
+    include Process::Stateful
 
     def record(data = {})
       report_sequence :actions, data

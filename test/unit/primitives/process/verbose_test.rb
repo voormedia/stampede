@@ -2,7 +2,7 @@ require "helper"
 
 class ReportingTest < Test::Unit::TestCase
   context "process" do
-    context "when verbosity" do
+    context "when verbose" do
       subject do
         ExampleProcess.create.tap do |process|
           process.send :include, Stampede::Process::Verbose

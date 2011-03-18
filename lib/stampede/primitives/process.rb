@@ -16,6 +16,7 @@ module Stampede
     autoload :Callbacks, "stampede/primitives/process/callbacks"
     autoload :Extending, "stampede/primitives/process/extending"
     autoload :Reporting, "stampede/primitives/process/reporting"
+    autoload :Stateful, "stampede/primitives/process/stateful"
     autoload :Timing, "stampede/primitives/process/timing"
     autoload :Verbose, "stampede/primitives/process/verbose"
 

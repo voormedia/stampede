@@ -12,10 +12,6 @@ module Stampede
       create Interval, interval, &Proc.new
     end
 
-    def repeat(times)
-      create Repeater, times, &Proc.new
-    end
-
     class Interval < Group
       class_attribute :interval
 
@@ -34,21 +30,6 @@ module Stampede
       end
 
       def finish
-      end
-    end
-
-    class Repeater < Group
-      class_attribute :times
-
-      class << self
-        def initialize(times, options = {})
-          super "repeat #{times.inspect} times"
-          self.times = times.to_i
-        end
-      end
-
-      def start
-        times.times { start_children }
       end
     end
   end

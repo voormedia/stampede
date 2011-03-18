@@ -17,7 +17,7 @@ class ReportingTest < Test::Unit::TestCase
       should "report name and value" do
         subject.before_finish { report :name => "value" }
         subject.run(@runner)
-        assert_equal({:label=>"exampleprocess", :name=>"value"}, @runner.reporter.reported.first)
+        assert_equal({:label => "exampleprocess", :name => "value"}, @runner.reporter.reported.first)
       end
 
       should "report name and nil value" do
@@ -34,7 +34,7 @@ class ReportingTest < Test::Unit::TestCase
         should "send data to through context to reporter" do
           subject.before_finish { report :name => "value" }
           subject.run(@context)
-          assert_equal({:label=>"exampleprocess", :name=>"value"}, @runner.reporter.reported.first)
+          assert_equal({:label => "exampleprocess", :name => "value"}, @runner.reporter.reported.first)
         end
       end
     end

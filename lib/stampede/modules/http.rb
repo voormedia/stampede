@@ -1,4 +1,5 @@
 require "em-http-request"
+require "cookiejar"
 
 module Stampede
   module Modules::HTTP
@@ -31,8 +32,12 @@ module Stampede
         latency = nil
 
         request.headers do
+          last_url = request.last_effective_url.normalize.to_s
           latency ||= elapsed
-          report :url => request.last_effective_url.normalize.to_s,
+
+          cookiejar.set_cookie last_url, request.response_header["SET_COOKIE"]
+
+          report :url => last_url,
             :status => request.response_header.status,
             :latency => latency,
             :compressed => request.response_header.compressed?
@@ -48,7 +53,7 @@ module Stampede
         request.callback do
           report :success => true,
             :redirects => request.redirects,
-            :length => inflated_content_length
+            :length => inflated_content_length || request.response.length
           finish
         end
 
@@ -61,12 +66,20 @@ module Stampede
 
       private
 
+      def cookiejar
+        state[:http_cookiejar] ||= CookieJar::Jar.new
+      end
+
       def build_request
         EM::HttpRequest.new(url).send(http_method, collect_options)
       end
 
       def collect_options
-        options.merge :redirects => 0, :head => HEADERS, :inactivity_timeout => 30
+        options.merge :redirects => 5, :head => HEADERS, :inactivity_timeout => 30
+      end
+
+      def state
+        if @context.respond_to? :[]= then @context else {} end
       end
     end
   end
