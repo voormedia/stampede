@@ -14,16 +14,30 @@ class ReportingTest < Test::Unit::TestCase
         @runner.reporter = DummyReporter.new
       end
 
-      should "report name and value" do
-        subject.before_finish { report :name => "value" }
-        subject.run(@runner)
-        assert_equal({:label => "exampleprocess", :name => "value"}, @runner.reporter.reported.first)
+      context "name and value" do
+        setup do
+          subject.before_finish { report :name => "value" }
+          subject.run(@runner)
+        end
+
+        should "include reported value" do
+          assert_equal "value", @runner.reporter.reported.first[:name]
+        end
+
+        should "include process name" do
+          assert_equal "exampleprocess", @runner.reporter.reported.first[:label]
+        end
       end
 
-      should "report name and nil value" do
-        subject.before_finish { report :name => nil }
-        subject.run(@runner)
-        assert_nil @runner.reporter.reported.first[:name]
+      context "name and nil value" do
+        setup do
+          subject.before_finish { report :name => nil }
+          subject.run(@runner)
+        end
+
+        should "include reported nil value" do
+          assert_nil @runner.reporter.reported.first[:name]
+        end
       end
 
       context "from child" do
@@ -34,7 +48,7 @@ class ReportingTest < Test::Unit::TestCase
         should "send data to through context to reporter" do
           subject.before_finish { report :name => "value" }
           subject.run(@context)
-          assert_equal({:label => "exampleprocess", :name => "value"}, @runner.reporter.reported.first)
+          assert_equal "value", @runner.reporter.reported.first[:name]
         end
       end
     end

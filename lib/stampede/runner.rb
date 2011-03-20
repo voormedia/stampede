@@ -50,7 +50,7 @@ module Stampede
     end
 
     def record(data)
-      @reporter.record(data)
+      @reporter.record({ :host => Mac.address }.merge(data))
     end
 
     private

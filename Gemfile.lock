@@ -8,19 +8,23 @@ GEM
   specs:
     addressable (2.2.4)
     cookiejar (0.3.0)
-    em-http-request (0.3.0)
-      addressable (>= 2.0.0)
-      escape_utils
-      eventmachine (>= 0.12.9)
-    escape_utils (0.2.3)
+    em-http-request (1.0.0.beta.3)
+      addressable (>= 2.2.3)
+      em-socksify
+      eventmachine
+      http_parser.rb (>= 0.5.1)
+    em-socksify (0.1.0)
+      eventmachine
     eventmachine (1.0.0.beta.3)
     git (1.2.5)
+    http_parser.rb (0.5.1)
     i18n (0.5.0)
     jeweler (1.5.2)
       bundler (~> 1.0.0)
       git (>= 1.2.5)
       rake
     json (1.5.1)
+    macaddr (1.0.0)
     rainbow (1.1.1)
     rake (0.8.7)
     rr (1.0.2)
@@ -36,11 +40,12 @@ DEPENDENCIES
   activesupport (~> 3.0)!
   bundler (~> 1.0.0)
   cookiejar
-  em-http-request
+  em-http-request (= 1.0.0.beta.3)
   eventmachine (= 1.0.0.beta.3)
   i18n
   jeweler (~> 1.5.2)
   json
+  macaddr
   rainbow
   rr
   ruby-ntlm

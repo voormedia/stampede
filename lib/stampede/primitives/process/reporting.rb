@@ -1,4 +1,5 @@
 require "active_support/concern"
+require "macaddr"
 
 module Stampede
   # Report data to the current context.

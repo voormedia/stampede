@@ -3,6 +3,7 @@ require "thor"
 module Stampede
   class Server < Thor
     class_option "no-colors", :type => :boolean, :desc => "Avoid ANSI colors in output."
+    class_option "trace", :type => :boolean, :desc => "Show stack traces on errors."
 
     desc "start SCENARIO", "Starts scenario defined in the given file"
     long_desc <<-DOC
@@ -24,6 +25,7 @@ module Stampede
       Runner.start Scenario.from_file(scenario), options
     rescue Exception => e
       $stderr.puts e
+      $stderr.puts e.backtrace if options[:trace]
     end
 
     desc "quickstart", "Quick start guide", :hide => true
