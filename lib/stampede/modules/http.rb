@@ -67,7 +67,7 @@ module Stampede
       private
 
       def set_cookies(url, headers)
-        [*headers["SET_COOKIE"]].each do |header|
+        headers.cookie.each do |header|
           cookiejar.set_cookie url, header
         end
       end
