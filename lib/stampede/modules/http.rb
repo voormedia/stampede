@@ -44,13 +44,19 @@ module Stampede
       self.http_options.merge! options
     end
 
+    def connection_options(options)
+      extend_parent
+      self.http_connection_options.merge! options
+    end
+
     private
 
     def extend_parent
-      return if respond_to? :http_headers and respond_to? :http_options
-      class_attribute :http_headers, :http_options
+      return if respond_to? :http_headers and respond_to? :http_options and respond_to? :http_connection_options
+      class_attribute :http_headers, :http_options, :http_connection_options
       self.http_headers = {}
       self.http_options = {}
+      self.http_connection_options = {}
     end
 
     class Request < Action
@@ -131,7 +137,7 @@ module Stampede
       private
 
       def connection
-        @connection ||= EM::HttpRequest.new(url, CONNECTION_OPTIONS)
+        @connection ||= EM::HttpRequest.new(url, collect_connection_options)
       end
 
       def set_cookies(url, header)
@@ -153,6 +159,12 @@ module Stampede
 
       def cookiejar
         @cookiejar ||= (@context[:http_cookiejar] ||= CookieJar::Jar.new)
+      end
+
+      def collect_connection_options
+        CONNECTION_OPTIONS.dup.tap do |opts|
+          opts.merge! @context.http_connection_options if @context.respond_to? :http_connection_options
+        end
       end
 
       def collect_options
