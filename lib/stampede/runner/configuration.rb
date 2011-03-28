@@ -24,7 +24,7 @@ module Stampede
       if daemonize?
         Logger.new "stampede.log", :colorize => colorize?
       else
-        Logger.new $stdout, :buffer_size => 256, :colorize => colorize?
+        Logger.new $stdout, :buffer_size => 0, :colorize => colorize?
       end
     end
   end

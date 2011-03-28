@@ -6,13 +6,14 @@ module Stampede
   module Modules::HTTP
     METHODS = [:get, :post, :put, :delete, :head]
 
-    DEFAULT_OPTIONS = { :keepalive => true, :redirects => 0, :inactivity_timeout => 30 }
+    CONNECTION_OPTIONS = { :inactivity_timeout => 60, :connect_timeout => 30 }
+    DEFAULT_OPTIONS = { :keepalive => true, :redirects => 0 }
     DEFAULT_HEADERS = { "user-agent" => Stampede.user_agent }
 
     METHODS.each do |method|
       class_eval <<-RUBY
-        def #{method}(url, options = {})
-          push Request.create(:#{method}, url, options)
+        def #{method}(url, options = {}, &callback)
+          push Request.create(:#{method}, url, options, &callback)
         end
       RUBY
     end
@@ -53,12 +54,12 @@ module Stampede
     end
 
     class Request < Action
-      class_attribute :http_method, :url, :options
+      class_attribute :http_method, :url, :options, :callback
 
       class << self
-        def initialize(http_method, url, options = {})
-          super "#{http_method} #{url}"
-          self.http_method, self.url, self.options = http_method, url, options
+        def initialize(http_method, url, options = {}, &callback)
+          super options.delete(:as) || "#{http_method} #{url}"
+          self.http_method, self.url, self.options, self.callback = http_method, url, options, callback
         end
       end
 
@@ -78,7 +79,7 @@ module Stampede
         request = connection.send(http_method, options)
 
         request_report = {}
-        inflated_content_length = 0
+        response = ""
         latency = nil
         primary_request = true
 
@@ -100,18 +101,19 @@ module Stampede
         end
 
         request.stream do |data|
-          inflated_content_length += data.length
+          response << data
           request_report[:chunks] ||= []
           request_report[:chunks] << { :length => data.length, :elapsed => elapsed }
         end
 
         request.callback do
-          request_report.merge!(:success => true, :length => inflated_content_length || request.response.length)
+          request_report.merge!(:success => true, :length => response.length || request.response.length)
           if primary_request
             report request_report
           else
             report_sequence :subrequests, request_report
           end
+          instance_exec response, &callback if callback and primary_request
           finish_request
         end
 
@@ -127,6 +129,10 @@ module Stampede
       end
 
       private
+
+      def connection
+        @connection ||= EM::HttpRequest.new(url, CONNECTION_OPTIONS)
+      end
 
       def set_cookies(url, header)
         # Split the cookie header, because em-http-request (incorrectly) folds
@@ -149,14 +155,11 @@ module Stampede
         @cookiejar ||= (@context[:http_cookiejar] ||= CookieJar::Jar.new)
       end
 
-      def connection
-        @connection ||= EM::HttpRequest.new(url)
-      end
-
       def collect_options
-        DEFAULT_OPTIONS.dup.tap do |options|
-          options.merge! @context.http_options if @context.respond_to? :http_options
-          options.merge! :head => collect_headers
+        DEFAULT_OPTIONS.dup.tap do |opts|
+          opts.merge! @context.http_options if @context.respond_to? :http_options
+          opts.merge! options
+          opts.merge! :head => collect_headers
         end
       end
 

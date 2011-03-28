@@ -16,6 +16,10 @@ module Stampede
       end
     end
 
+    def subtract_time(time)
+      @subtract += time
+    end
+
     protected
 
     # The time the process was started.
@@ -26,6 +30,7 @@ module Stampede
 
     # Starts the timer. Automatically called before the process starts.
     def start_timer
+      @subtract = 0
       @start_time = Time.now
     end
 
@@ -35,7 +40,7 @@ module Stampede
     end
 
     def elapsed(since = @stop_time || Time.now)
-      ((since - @start_time) * 1000).round
+      ((since - @start_time - @subtract) * 1000).round
     end
   end
 end

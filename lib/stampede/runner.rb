@@ -9,7 +9,7 @@ module Stampede
 
     include Daemonization
 
-    attr_reader :logger, :config, :runner
+    attr_reader :config, :logger, :reporter, :runner
 
     class << self
       def start(scenario, config)
@@ -20,7 +20,8 @@ module Stampede
     def initialize(scenario, config)
       @scenario = scenario
       @config = Runner::Configuration.new(config)
-      @reporter = Reporters::JSON.new(@logger = @config.logger)
+      @logger = @config.logger
+      @reporter = Reporters::CouchDB.new("http://localhost:5984/stampede")
       @runner = self
     end
 
@@ -38,7 +39,7 @@ module Stampede
 
     def finish(exit_message = "Finished.")
       logger.log exit_message
-      logger.close { EM.stop }
+      reporter.close { logger.close { EM.stop } }
     end
     alias_method :child_finished, :finish
 

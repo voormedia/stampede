@@ -17,4 +17,5 @@ group :development do
   gem "shoulda-context", "1.0.0.beta1"
   gem "timecop", "~> 0.3"
   gem "rr"
+  gem "nokogiri"
 end

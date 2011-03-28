@@ -24,7 +24,7 @@ module Stampede
   autoload :Server, "stampede/server"
 
   module Reporters
-    autoload :JSON, "stampede/reporters/json"
+    autoload :CouchDB, "stampede/reporters/couchdb"
   end
 
   autoload :Process, "stampede/primitives/process"
@@ -36,6 +36,7 @@ module Stampede
   autoload :Session, "stampede/primitives/session"
   autoload :Action, "stampede/primitives/action"
   autoload :Lambda, "stampede/primitives/lambda"
+  autoload :Idle, "stampede/primitives/idle"
 
   module Modules
     autoload :HTTP, "stampede/modules/http"
