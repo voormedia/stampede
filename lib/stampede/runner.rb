@@ -21,7 +21,7 @@ module Stampede
       @scenario = scenario
       @config = Runner::Configuration.new(config)
       @logger = @config.logger
-      @reporter = Reporters::CouchDB.new("http://localhost:5984/stampede")
+      @reporter = @config.reporter
       @runner = self
     end
 

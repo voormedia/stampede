@@ -21,6 +21,9 @@ module Stampede
     method_option "verbose", :aliases => "-v", :type => :boolean,
       :desc => "Be very verbose about which actions are executed."
 
+    method_option "output", :aliases => "-o", :type => :string,
+      :desc => "Output target for the chosen reporter"
+
     def start(scenario)
       Runner.start Scenario.from_file(scenario), options
     rescue Exception => e
