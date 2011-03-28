@@ -7,7 +7,7 @@ gem "cookiejar"
 gem "ruby-ntlm"
 gem "thor"
 gem "json"
-gem "activesupport", "~> 3.0", :path => "~/Code/rails" #:git => "https://github.com/rails/rails.git"
+gem "activesupport", "~> 3.0", :git => "https://github.com/rails/rails.git"
 gem "rainbow"
 gem "macaddr"
 

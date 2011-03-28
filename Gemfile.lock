@@ -1,5 +1,6 @@
-PATH
-  remote: ~/Code/rails
+GIT
+  remote: https://github.com/rails/rails.git
+  revision: 0a28073acc8e81e75a71be7098a4753325ce64f0
   specs:
     activesupport (3.1.0.beta)
 
